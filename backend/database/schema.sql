@@ -4,7 +4,6 @@ CREATE TABLE IF NOT EXISTS users (
     user_id SERIAL PRIMARY KEY,
     full_name VARCHAR(100) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
-    password_hash TEXT NOT NULL,
     timezone VARCHAR(50) DEFAULT 'UTC',
     currency VARCHAR(3) DEFAULT 'CAD',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
