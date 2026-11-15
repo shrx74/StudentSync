@@ -5,21 +5,20 @@ import Notifications from './components/Notifications'
 import Deadlines from './components/Deadlines'
 import ConflictBanner from './components/ConflictBanner'
 import FinancialOverview from './components/FinancialOverview'
+import { dashboardData } from './sampleData'
 
 function App() {
-  const hasConflict = true
-
   return (
     <div className="page">
       <Header />
       <main className="dashboard">
         <h1>Dashboard</h1>
-        {hasConflict && <ConflictBanner />}
+        {dashboardData.hasConflict && <ConflictBanner message={dashboardData.conflictMessage} />}
         <div className="panels">
-          <Schedule />
-          <Notifications />
-          <Deadlines />
-          <FinancialOverview />
+          <Schedule date={dashboardData.date} items={dashboardData.schedule} />
+          <Notifications items={dashboardData.notifications} />
+          <Deadlines items={dashboardData.deadlines} />
+          <FinancialOverview tiles={dashboardData.finance} />
         </div>
       </main>
       <Footer />

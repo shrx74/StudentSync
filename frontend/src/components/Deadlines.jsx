@@ -1,13 +1,20 @@
 import { FaRegClock } from 'react-icons/fa'
 import DeadlineItem from './DeadlineItem'
 
-function Deadlines() {
+function Deadlines({ items }) {
   return (
     <section className="panel">
-      <h2><FaRegClock /> Upcoming Deadlines &amp; Costs</h2>
+      <h2><FaRegClock /> Upcoming Deadlines & Costs</h2>
       <div className="items">
-        <DeadlineItem title="Programming Assignment 1" date="2026-09-20, 11:59 PM" status="In Progress" />
-        <DeadlineItem title="Rent" date="2026-10-01" amount="$600.00" />
+        {items.map((item) => (
+          <DeadlineItem
+            key={item.id}
+            title={item.title}
+            date={item.date}
+            status={item.status}
+            amount={item.amount}
+          />
+        ))}
       </div>
     </section>
   )
