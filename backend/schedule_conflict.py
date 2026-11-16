@@ -34,3 +34,17 @@ class ScheduleConflictChecker:
 
         # Check whether the activities overlap
         return start1 < end2 and start2 < end1
+
+    def check_datetime_conflict(self, start1, end1, start2, end2):
+
+        """
+        Checks whether two activities with complete
+        date and time values overlap.
+        """
+
+        # Make sure both activities have valid time ranges
+        if start1 >= end1 or start2 >= end2:
+            raise ValueError("End time must be after start time")
+
+        # Check whether the two activities overlap
+        return start1 < end2 and start2 < end1
