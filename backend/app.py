@@ -1,9 +1,10 @@
 from flask import Flask, request, jsonify
 from repositories.user_repository import UserRepository
-
+from routes.conflict_routes import conflict_bp
 
 def create_app():
     app = Flask(__name__)
+    app.register_blueprint(conflict_bp)
     repo = UserRepository()
 
     @app.get("/")
