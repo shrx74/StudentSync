@@ -7,7 +7,7 @@ try:
             result = cursor.fetchone()
 
             print("Connection successful!")
-            print("Database:", result["current_database"])
+            print("Database:", result[0])
 
 except Exception as error:
     print("Connection failed:", error)
