@@ -1,4 +1,5 @@
 from datetime import date, datetime, time, timedelta, timezone
+from decimal import Decimal
 from unittest.mock import patch
 
 from app import create_app
@@ -38,14 +39,19 @@ def shift(employer, day, start, end):
     }
 
 
-def get_dashboard(tasks=(), meetings=(), shifts=(), conflicts=()):
+def get_dashboard(tasks=(), meetings=(), shifts=(), conflicts=(), incomes=(), expenses=(), targets=(), contributions=()):
     with patch("routes.dashboard_routes.users") as mock_users, \
             patch("routes.dashboard_routes.academic") as mock_academic, \
             patch("routes.dashboard_routes.work") as mock_work, \
             patch("routes.dashboard_routes.ConflictService") as mock_service, \
+            patch("routes.dashboard_routes.budget") as mock_budget, \
             patch("routes.reminder_routes.academic") as mock_tasks:
         mock_users.find_by_id.return_value = {"user_id": 1}
         mock_service.return_value.get_conflicts.return_value = list(conflicts)
+        mock_budget.get_incomes.return_value = list(incomes)
+        mock_budget.get_expenses.return_value = list(expenses)
+        mock_budget.get_savings_targets.return_value = list(targets)
+        mock_budget.get_contributions.return_value = list(contributions)
         mock_tasks.get_tasks.return_value = list(tasks)
         mock_academic.get_class_meetings.return_value = list(meetings)
         mock_work.get_shifts.return_value = list(shifts)
@@ -111,3 +117,38 @@ def test_dashboard_no_conflicts():
     response = get_dashboard()
 
     assert response.get_json()["conflicts"] == []
+
+
+def test_dashboard_finance_lists():
+    income = {"income_id": 1, "source": "Salary", "amount": Decimal("1200.00"), "income_date": TODAY}
+    expense = {"expense_id": 1, "description": "Rent", "amount": Decimal("600.50"),
+               "expense_date": TODAY, "category_name": "Rent"}
+
+    response = get_dashboard(incomes=[income], expenses=[expense])
+    finance = response.get_json()["finance"]
+
+    assert finance["incomes"][0]["amount"] == 1200.0
+    assert finance["incomes"][0]["income_date"] == TODAY.isoformat()
+    assert finance["expenses"][0]["amount"] == 600.5
+
+
+def test_dashboard_savings_target_contributions():
+    target = {"target_id": 3, "target_name": "New Laptop", "target_amount": Decimal("1500.00")}
+    contribution = {"contribution_id": 1, "target_id": 3, "amount": Decimal("200.00"),
+                    "contribution_date": TODAY}
+
+    response = get_dashboard(targets=[target], contributions=[contribution])
+    saved = response.get_json()["finance"]["savings_targets"][0]
+
+    assert saved["target_name"] == "New Laptop"
+    assert saved["contributions"][0]["amount"] == 200.0
+
+
+def test_dashboard_empty_finance():
+    response = get_dashboard()
+
+    assert response.get_json()["finance"] == {
+        "incomes": [],
+        "expenses": [],
+        "savings_targets": []
+    }

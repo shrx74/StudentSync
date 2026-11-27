@@ -4,8 +4,10 @@ from flask import Blueprint, jsonify
 
 from conflict_service import ConflictService
 from repositories.academic_repository import AcademicRepository
+from repositories.budget_repository import BudgetRepository
 from repositories.user_repository import UserRepository
 from repositories.work_repository import WorkRepository
+from routes.budget_routes import finance_json
 from routes.reminder_routes import reminder_list
 from utils import calculate_earnings
 
@@ -14,6 +16,7 @@ dashboard_bp = Blueprint("dashboard", __name__)
 users = UserRepository()
 academic = AcademicRepository()
 work = WorkRepository()
+budget = BudgetRepository()
 
 
 def todays_schedule(user_id, today):
@@ -45,6 +48,24 @@ def todays_schedule(user_id, today):
     return sorted(schedule, key=lambda item: item["start"])
 
 
+def finance_overview(user_id):
+    targets = []
+
+    for target in budget.get_savings_targets(user_id):
+        target = finance_json(target)
+        target["contributions"] = [
+            finance_json(contribution)
+            for contribution in budget.get_contributions(user_id, target["target_id"])
+        ]
+        targets.append(target)
+
+    return {
+        "incomes": [finance_json(income) for income in budget.get_incomes(user_id)],
+        "expenses": [finance_json(expense) for expense in budget.get_expenses(user_id)],
+        "savings_targets": targets
+    }
+
+
 @dashboard_bp.get("/users/<int:user_id>/dashboard")
 def dashboard(user_id):
     if users.find_by_id(user_id) is None:
@@ -53,5 +74,6 @@ def dashboard(user_id):
     return jsonify({
         "schedule": todays_schedule(user_id, date.today()),
         "conflicts": ConflictService().get_conflicts(user_id),
-        "reminders": reminder_list(user_id)
+        "reminders": reminder_list(user_id),
+        "finance": finance_overview(user_id)
     })
