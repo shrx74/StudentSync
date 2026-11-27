@@ -9,6 +9,11 @@ class Database:
 
     @staticmethod
     def connect():
+        url = os.getenv("DATABASE_URL")
+
+        if url:
+            return psycopg.connect(url)
+
         return psycopg.connect(
             host=os.getenv("DB_HOST"),
             port=os.getenv("DB_PORT"),
