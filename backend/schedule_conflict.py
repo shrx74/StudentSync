@@ -48,3 +48,42 @@ class ScheduleConflictChecker:
 
         # Check whether the two activities overlap
         return start1 < end2 and start2 < end1
+
+    def check_weekly_conflict(
+        self, shift_start, shift_end, day_of_week,
+        class_start, class_end, start_date, end_date
+    ):
+        # Get the date of the work shift
+        shift_date = shift_start.date()
+
+        # Check whether the shift occurs on the class weekday
+        if shift_date.isoweekday() != day_of_week:
+            return False
+
+        # Check whether the shift is within the class date range
+        if shift_date < start_date or shift_date > end_date:
+            return False
+
+        # Combine the class date and time
+        meeting_start = datetime.combine(
+            shift_date, class_start
+        )
+
+        meeting_end = datetime.combine(
+            shift_date, class_end
+        )
+
+        # Match the timezone of the work shift
+        meeting_start = meeting_start.replace(
+            tzinfo=shift_start.tzinfo
+        )
+
+        meeting_end = meeting_end.replace(
+            tzinfo=shift_start.tzinfo
+        )
+
+        # Reuse the existing datetime conflict checker
+        return self.check_datetime_conflict(
+            shift_start, shift_end,
+            meeting_start, meeting_end
+        )
