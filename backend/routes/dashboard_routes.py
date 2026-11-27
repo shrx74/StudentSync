@@ -3,6 +3,7 @@ from datetime import date
 from flask import Blueprint, jsonify
 
 from conflict_service import ConflictService
+from finance_summary import savings_progress, summarize
 from repositories.academic_repository import AcademicRepository
 from repositories.budget_repository import BudgetRepository
 from repositories.user_repository import UserRepository
@@ -49,21 +50,23 @@ def todays_schedule(user_id, today):
 
 
 def finance_overview(user_id):
+    incomes = budget.get_incomes(user_id)
+    expenses = budget.get_expenses(user_id)
     targets = []
 
     for target in budget.get_savings_targets(user_id):
+        contributions = budget.get_contributions(user_id, target["target_id"])
         target = finance_json(target)
-        target["contributions"] = [
-            finance_json(contribution)
-            for contribution in budget.get_contributions(user_id, target["target_id"])
-        ]
+        target.update(finance_json(savings_progress(target["target_amount"], contributions)))
+        target["contributions"] = [finance_json(contribution) for contribution in contributions]
         targets.append(target)
 
-    return {
-        "incomes": [finance_json(income) for income in budget.get_incomes(user_id)],
-        "expenses": [finance_json(expense) for expense in budget.get_expenses(user_id)],
-        "savings_targets": targets
-    }
+    overview = finance_json(summarize(incomes, expenses))
+    overview["incomes"] = [finance_json(income) for income in incomes]
+    overview["expenses"] = [finance_json(expense) for expense in expenses]
+    overview["savings_targets"] = targets
+
+    return overview
 
 
 @dashboard_bp.get("/users/<int:user_id>/dashboard")
