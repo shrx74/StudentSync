@@ -80,7 +80,7 @@ class WorkRepository:
     def get_shifts(self, user_id):
         return query(
             """
-            SELECT s.*, j.hourly_wage
+            SELECT s.*, j.hourly_wage, j.employer
             FROM work_shifts s
             JOIN jobs j ON s.job_id = j.job_id
             WHERE j.user_id = %s
