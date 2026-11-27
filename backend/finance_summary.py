@@ -23,6 +23,7 @@ def summarize(incomes, expenses):
         "balance": balance
     }
 
+
 def savings_progress(target_amount, contributions):
 
     target_amount = Decimal(str(target_amount))
