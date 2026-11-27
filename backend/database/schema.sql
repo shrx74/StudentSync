@@ -181,3 +181,61 @@ CREATE TABLE IF NOT EXISTS reminders (
     remind_at TIMESTAMPTZ NOT NULL,
     status VARCHAR(20) DEFAULT 'pending'
 );
+
+-- 17. Assignment: Stores academic assignments.
+CREATE TABLE IF NOT EXISTS assignments (
+    id SERIAL PRIMARY KEY,
+    title TEXT NOT NULL,
+    course TEXT,
+    due_date DATE NOT NULL
+);
+
+-- 18. Class: Stores weekly class schedules.
+CREATE TABLE IF NOT EXISTS classes (
+    id SERIAL PRIMARY KEY,
+    course TEXT NOT NULL,
+    day TEXT NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    CHECK (end_time > start_time)
+);
+
+-- 19. Shifts: Stores weekly work shifts.
+CREATE TABLE IF NOT EXISTS shifts (
+    id SERIAL PRIMARY KEY,
+    employer TEXT NOT NULL,
+    day TEXT NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    CHECK (end_time > start_time)
+);
+
+-- 20. Transactions: Stores income and expense transactions.
+CREATE TABLE IF NOT EXISTS transactions (
+    id SERIAL PRIMARY KEY,
+    kind TEXT NOT NULL,
+    amount NUMERIC(10,2) NOT NULL,
+    category TEXT,
+    date DATE NOT NULL,
+    CHECK (kind IN ('expense', 'income')),
+    CHECK (amount > 0)
+);
+
+-- 21. Stores upcoming financial obligations.
+CREATE TABLE IF NOT EXISTS upcoming_costs (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    amount NUMERIC(10,2) NOT NULL,
+    due_date DATE NOT NULL,
+    CHECK (amount > 0)
+);
+
+-- 22. Stores a single savings goal.
+CREATE TABLE IF NOT EXISTS savings_goal (
+    id INT PRIMARY KEY DEFAULT 1,
+    target NUMERIC(10,2) NOT NULL,
+    saved NUMERIC(10,2) NOT NULL DEFAULT 0,
+    CHECK (id = 1),
+    CHECK (target > 0),
+    CHECK (saved >= 0)
+);
