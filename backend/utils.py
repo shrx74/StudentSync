@@ -1,7 +1,7 @@
-
 from datetime import date, datetime, time
 from math import isfinite
 from flask import request
+from decimal import Decimal, InvalidOperation
 
 
 def get_data(fields):
@@ -117,3 +117,71 @@ def calculate_earnings(shift):
     result["estimated_earnings"] = round(earnings, 2)
 
     return result
+
+
+def check_amount(value):
+    if isinstance(value, bool):
+        raise ValueError("Invalid amount")
+
+    try:
+        amount = Decimal(str(value))
+
+        if not amount.is_finite():
+            raise ValueError("Invalid amount")
+
+        if amount <= 0 or amount > Decimal("99999999.99"):
+            raise ValueError("Invalid amount")
+
+        if amount != amount.quantize(Decimal("0.01")):
+            raise ValueError("Invalid decimal places")
+
+    except InvalidOperation:
+        raise ValueError("Invalid amount")
+
+
+def check_text(value, maximum):
+    if not isinstance(value, str):
+        raise ValueError("Invalid text")
+
+    if not value.strip() or len(value) > maximum:
+        raise ValueError("Invalid text")
+
+
+def check_finance_date(value):
+    if not isinstance(value, str):
+        raise ValueError("Invalid date")
+
+    if date.fromisoformat(value).isoformat() != value:
+        raise ValueError("Invalid date format")
+
+
+def check_income(data):
+    check_text(data["source"], 150)
+    check_amount(data["amount"])
+    check_finance_date(data["income_date"])
+
+
+def check_category(data):
+    check_text(data["category_name"], 100)
+
+
+def check_expense(data):
+    if type(data["category_id"]) is not int:
+        raise ValueError("Invalid category")
+
+    if not 1 <= data["category_id"] <= 2147483647:
+        raise ValueError("Invalid category")
+
+    check_text(data["description"], 200)
+    check_amount(data["amount"])
+    check_finance_date(data["expense_date"])
+
+
+def check_savings_target(data):
+    check_text(data["target_name"], 150)
+    check_amount(data["target_amount"])
+
+
+def check_contribution(data):
+    check_amount(data["amount"])
+    check_finance_date(data["contribution_date"])
