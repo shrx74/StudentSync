@@ -1,4 +1,5 @@
 import unittest
+from datetime import date, time
 from unittest.mock import patch, MagicMock
 from repositories.conflict_repository import ConflictRepository
 
@@ -50,6 +51,42 @@ class TestConflictRepository(unittest.TestCase):
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0][1], "Campus Library")
         self.assertEqual(mock_cursor.execute.call_args.args[1], (1,))
+
+    @patch("repositories.conflict_repository.Database.connect")
+    def test_get_class_meetings(self, mock_connect):
+
+        mock_connection = MagicMock()
+        mock_cursor = MagicMock()
+
+        mock_connect.return_value.__enter__.return_value = mock_connection
+        mock_connection.cursor.return_value.__enter__.return_value = mock_cursor
+
+        # Simulate a recurring Monday class
+        mock_cursor.fetchall.return_value = [
+            (
+                1,
+                "Calculus",
+                1,
+                time(11, 0),
+                time(12, 30),
+                date(2026, 9, 9),
+                date(2026, 12, 4)
+            )
+        ]
+
+        repo = ConflictRepository()
+        result = repo.get_class_meetings(1)
+
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0][1], "Calculus")
+        self.assertEqual(result[0][2], 1)
+        self.assertEqual(result[0][3], time(11, 0))
+        self.assertEqual(result[0][4], time(12, 30))
+
+        # Verify that the correct user ID was passed
+        self.assertEqual(
+            mock_cursor.execute.call_args.args[1], (1,)
+        )
 
 
 if __name__ == "__main__":
