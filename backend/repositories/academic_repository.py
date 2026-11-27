@@ -1,33 +1,12 @@
 
-from database.connection import Database
+from db import query
 
 
 class AcademicRepository:
 
-    def query(self, sql, values=(), many=False):
-        with Database.connect() as connection:
-            with connection.cursor() as cursor:
-                cursor.execute(sql, values)
-
-                if cursor.description is None:
-                    return None
-
-                columns = [col.name for col in cursor.description]
-
-                if many:
-                    rows = cursor.fetchall()
-                    return [dict(zip(columns, row)) for row in rows]
-
-                row = cursor.fetchone()
-
-                if row is None:
-                    return None
-
-                return dict(zip(columns, row))
-
     # Add a semester
     def create_semester(self, user_id, data):
-        return self.query(
+        return query(
             """
             INSERT INTO semesters
             (user_id, semester_name, start_date, end_date)
@@ -41,21 +20,21 @@ class AcademicRepository:
 
     # Get all semesters
     def get_semesters(self, user_id):
-        return self.query(
+        return query(
             "SELECT * FROM semesters WHERE user_id = %s ORDER BY start_date",
             (user_id,), True
         )
 
     # Get one semester
     def get_semester(self, user_id, semester_id):
-        return self.query(
+        return query(
             "SELECT * FROM semesters WHERE user_id = %s AND semester_id = %s",
             (user_id, semester_id)
         )
 
     # Update a semester
     def update_semester(self, user_id, semester_id, data):
-        return self.query(
+        return query(
             """
             UPDATE semesters
             SET semester_name = %s, start_date = %s, end_date = %s
@@ -68,7 +47,7 @@ class AcademicRepository:
 
     # Delete a semester
     def delete_semester(self, user_id, semester_id):
-        return self.query(
+        return query(
             """
             DELETE FROM semesters
             WHERE user_id = %s AND semester_id = %s
@@ -79,7 +58,7 @@ class AcademicRepository:
 
     # Add a course
     def create_course(self, user_id, data):
-        return self.query(
+        return query(
             """
             INSERT INTO courses
             (semester_id, course_code, course_name, instructor, location)
@@ -95,7 +74,7 @@ class AcademicRepository:
 
     # Get all courses
     def get_courses(self, user_id):
-        return self.query(
+        return query(
             """
             SELECT c.*
             FROM courses c
@@ -108,7 +87,7 @@ class AcademicRepository:
 
     # Get one course
     def get_course(self, user_id, course_id):
-        return self.query(
+        return query(
             """
             SELECT c.*
             FROM courses c
@@ -120,7 +99,7 @@ class AcademicRepository:
 
     # Update a course
     def update_course(self, user_id, course_id, data):
-        return self.query(
+        return query(
             """
             UPDATE courses
             SET semester_id = %s, course_code = %s,
@@ -137,7 +116,7 @@ class AcademicRepository:
 
     # Delete a course
     def delete_course(self, user_id, course_id):
-        return self.query(
+        return query(
             """
             DELETE FROM courses
             WHERE course_id = %s
@@ -150,7 +129,7 @@ class AcademicRepository:
 
     # Add an academic task
     def create_task(self, user_id, data):
-        return self.query(
+        return query(
             """
             INSERT INTO academic_tasks
             (user_id, course_id, title, description,
@@ -165,7 +144,7 @@ class AcademicRepository:
 
     # Get all academic tasks
     def get_tasks(self, user_id):
-        return self.query(
+        return query(
             """
             SELECT * FROM academic_tasks
             WHERE user_id = %s ORDER BY due_date
@@ -175,7 +154,7 @@ class AcademicRepository:
 
     # Get one academic task
     def get_task(self, user_id, task_id):
-        return self.query(
+        return query(
             """
             SELECT * FROM academic_tasks
             WHERE user_id = %s AND task_id = %s
@@ -185,7 +164,7 @@ class AcademicRepository:
 
     # Update an academic task
     def update_task(self, user_id, task_id, data):
-        return self.query(
+        return query(
             """
             UPDATE academic_tasks
             SET course_id = %s, title = %s, description = %s,
@@ -201,7 +180,7 @@ class AcademicRepository:
 
     # Delete an academic task
     def delete_task(self, user_id, task_id):
-        return self.query(
+        return query(
             """
             DELETE FROM academic_tasks
             WHERE user_id = %s AND task_id = %s
