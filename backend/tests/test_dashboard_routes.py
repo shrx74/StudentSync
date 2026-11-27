@@ -142,13 +142,29 @@ def test_dashboard_savings_target_contributions():
 
     assert saved["target_name"] == "New Laptop"
     assert saved["contributions"][0]["amount"] == 200.0
+    assert saved["total_saved"] == 200.0
+    assert saved["percent"] == 13
 
 
 def test_dashboard_empty_finance():
     response = get_dashboard()
 
     assert response.get_json()["finance"] == {
+        "total_income": 0.0,
+        "total_expenses": 0.0,
+        "balance": 0.0,
         "incomes": [],
         "expenses": [],
         "savings_targets": []
     }
+
+
+def test_dashboard_finance_totals():
+    incomes = [{"amount": Decimal("1200.00")}, {"amount": Decimal("300.00")}]
+    expenses = [{"amount": Decimal("600.00")}, {"amount": Decimal("150.00")}]
+
+    finance = get_dashboard(incomes=incomes, expenses=expenses).get_json()["finance"]
+
+    assert finance["total_income"] == 1500.0
+    assert finance["total_expenses"] == 750.0
+    assert finance["balance"] == 750.0
