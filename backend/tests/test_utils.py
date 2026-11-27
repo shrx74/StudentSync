@@ -1,8 +1,7 @@
 import pytest
 from datetime import datetime
 
-from utils import check_period, check_task, check_job, check_shift, calculate_earnings
-
+from utils import check_period, check_task, check_job, check_shift, calculate_earnings, check_meeting
 
 # Test 1: Check valid semester dates
 def test_valid_period():
@@ -63,3 +62,67 @@ def test_calculate_earnings():
 
     assert result["paid_hours"] == 5.5
     assert result["estimated_earnings"] == 99.0
+
+# Test 7: Check valid meeting
+def test_valid_meeting():
+    data = {
+        "day_of_week": 1,
+        "start_time": "10:00",
+        "end_time": "11:00",
+        "start_date": "2026-09-09",
+        "end_date": "2026-12-04"
+    }
+
+    check_meeting(data)
+
+# Test 8: Check Invalid day
+def test_invalid_meeting_day():
+    data = {
+        "day_of_week": 8,
+        "start_time": "10:00",
+        "end_time": "11:00",
+        "start_date": "2026-09-09",
+        "end_date": "2026-12-04"
+    }
+
+    with pytest.raises(ValueError):
+        check_meeting(data)
+
+# Test 9: Invalid time range
+def test_invalid_meeting_time():
+    data = {
+        "day_of_week": 1,
+        "start_time": "12:00",
+        "end_time": "10:00",
+        "start_date": "2026-09-09",
+        "end_date": "2026-12-04"
+    }
+
+    with pytest.raises(ValueError):
+        check_meeting(data)
+
+# Test 10: Invalid date range
+def test_invalid_meeting_period():
+    data = {
+        "day_of_week": 1,
+        "start_time": "10:00",
+        "end_time": "11:00",
+        "start_date": "2026-12-04",
+        "end_date": "2026-09-09"
+    }
+
+    with pytest.raises(ValueError):
+        check_meeting(data)
+
+# Test 11: Equal start and end times
+def test_equal_meeting_times():
+    data = {
+        "day_of_week": 1,
+        "start_time": "10:00",
+        "end_time": "10:00",
+        "start_date": "2026-09-09",
+        "end_date": "2026-12-04"
+    }
+
+    with pytest.raises(ValueError):
+        check_meeting(data)

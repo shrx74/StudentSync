@@ -1,5 +1,5 @@
 
-from datetime import date, datetime
+from datetime import date, datetime, time
 from math import isfinite
 from flask import request
 
@@ -37,6 +37,28 @@ def check_task(data):
         "pending", "in_progress", "completed"
     ):
         raise ValueError("Invalid task status")
+
+
+def check_meeting(data):
+    day = data["day_of_week"]
+
+    if type(day) is not int or day < 1 or day > 7:
+        raise ValueError("Invalid day of week")
+
+    try:
+        start = time.fromisoformat(data["start_time"])
+        end = time.fromisoformat(data["end_time"])
+
+        if start.tzinfo is not None or end.tzinfo is not None:
+            raise ValueError("Invalid meeting time")
+
+        if end <= start:
+            raise ValueError("End time must be after start time")
+
+        check_period(data["start_date"], data["end_date"])
+
+    except TypeError:
+        raise ValueError("Invalid meeting date or time")
 
 
 def check_job(data):

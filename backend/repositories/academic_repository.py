@@ -188,3 +188,91 @@ class AcademicRepository:
             """,
             (user_id, task_id)
         )
+
+    #Create class meeting
+    def create_class_meeting(self, user_id, data):
+        return query(
+            """
+            INSERT INTO class_meetings
+            (course_id, day_of_week, start_time, end_time,
+             start_date, end_date, location)
+            SELECT c.course_id, %s, %s, %s, %s, %s, %s
+            FROM courses c
+            JOIN semesters s ON c.semester_id = s.semester_id
+            WHERE c.course_id = %s AND s.user_id = %s
+            RETURNING *
+            """,
+            (data["day_of_week"], data["start_time"],
+             data["end_time"], data["start_date"],
+             data["end_date"], data.get("location"),
+             data["course_id"], user_id)
+        )
+
+    #Get all class meetings
+    def get_class_meetings(self, user_id):
+        return query(
+            """
+            SELECT m.*, c.course_code, c.course_name
+            FROM class_meetings m
+            JOIN courses c ON m.course_id = c.course_id
+            JOIN semesters s ON c.semester_id = s.semester_id
+            WHERE s.user_id = %s
+            ORDER BY m.day_of_week, m.start_time
+            """,
+            (user_id,), True
+        )
+
+    #Get one class meeting
+    def get_class_meeting(self, user_id, meeting_id):
+        return query(
+            """
+            SELECT m.*, c.course_code, c.course_name
+            FROM class_meetings m
+            JOIN courses c ON m.course_id = c.course_id
+            JOIN semesters s ON c.semester_id = s.semester_id
+            WHERE s.user_id = %s AND m.meeting_id = %s
+            """,
+            (user_id, meeting_id)
+        )
+
+    #Update class meetings
+    def update_class_meeting(self, user_id, meeting_id, data):
+        return query(
+            """
+            UPDATE class_meetings
+            SET day_of_week = %s, start_time = %s,
+                end_time = %s, start_date = %s,
+                end_date = %s, location = %s
+            WHERE meeting_id = %s
+              AND course_id IN (
+                  SELECT c.course_id
+                  FROM courses c
+                  JOIN semesters s
+                  ON c.semester_id = s.semester_id
+                  WHERE s.user_id = %s
+              )
+            RETURNING *
+            """,
+            (data["day_of_week"], data["start_time"],
+             data["end_time"], data["start_date"],
+             data["end_date"], data.get("location"),
+             meeting_id, user_id)
+        )
+
+    #Delete class meetings
+    def delete_class_meeting(self, user_id, meeting_id):
+        return query(
+            """
+            DELETE FROM class_meetings
+            WHERE meeting_id = %s
+              AND course_id IN (
+                  SELECT c.course_id
+                  FROM courses c
+                  JOIN semesters s
+                  ON c.semester_id = s.semester_id
+                  WHERE s.user_id = %s
+              )
+            RETURNING meeting_id
+            """,
+            (meeting_id, user_id)
+        )
