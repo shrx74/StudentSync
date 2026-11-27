@@ -2,6 +2,7 @@ from datetime import date
 
 from flask import Blueprint, jsonify
 
+from conflict_service import ConflictService
 from repositories.academic_repository import AcademicRepository
 from repositories.user_repository import UserRepository
 from repositories.work_repository import WorkRepository
@@ -51,5 +52,6 @@ def dashboard(user_id):
 
     return jsonify({
         "schedule": todays_schedule(user_id, date.today()),
+        "conflicts": ConflictService().get_conflicts(user_id),
         "reminders": reminder_list(user_id)
     })

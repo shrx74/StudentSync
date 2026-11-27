@@ -38,12 +38,14 @@ def shift(employer, day, start, end):
     }
 
 
-def get_dashboard(tasks=(), meetings=(), shifts=()):
+def get_dashboard(tasks=(), meetings=(), shifts=(), conflicts=()):
     with patch("routes.dashboard_routes.users") as mock_users, \
             patch("routes.dashboard_routes.academic") as mock_academic, \
             patch("routes.dashboard_routes.work") as mock_work, \
+            patch("routes.dashboard_routes.ConflictService") as mock_service, \
             patch("routes.reminder_routes.academic") as mock_tasks:
         mock_users.find_by_id.return_value = {"user_id": 1}
+        mock_service.return_value.get_conflicts.return_value = list(conflicts)
         mock_tasks.get_tasks.return_value = list(tasks)
         mock_academic.get_class_meetings.return_value = list(meetings)
         mock_work.get_shifts.return_value = list(shifts)
@@ -95,3 +97,17 @@ def test_schedule_shift_earnings():
     assert item["start"] == "16:00"
     assert item["end"] == "22:00"
     assert item["estimated_earnings"] == 99.0
+
+
+def test_dashboard_conflicts():
+    conflict = {"study_session": "Calculus Review", "work_shift": "Campus Library"}
+
+    response = get_dashboard(conflicts=[conflict])
+
+    assert response.get_json()["conflicts"] == [conflict]
+
+
+def test_dashboard_no_conflicts():
+    response = get_dashboard()
+
+    assert response.get_json()["conflicts"] == []
