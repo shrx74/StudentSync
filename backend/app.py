@@ -4,7 +4,7 @@ from routes.user_routes import user_bp
 from routes.academic_routes import academic_bp
 from routes.work_routes import work_bp
 from routes.conflict_routes import conflict_bp
-
+from routes.budget_routes import budget_bp
 
 def create_app():
     app = Flask(__name__)
@@ -13,6 +13,7 @@ def create_app():
     app.register_blueprint(academic_bp)
     app.register_blueprint(work_bp)
     app.register_blueprint(conflict_bp)
+    app.register_blueprint(budget_bp)
 
     @app.errorhandler(ValueError)
     def invalid_data(error):

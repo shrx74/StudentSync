@@ -2,7 +2,11 @@ import pytest
 from datetime import datetime
 
 from utils import check_period, check_task, check_job, check_shift, calculate_earnings
-
+from utils import (
+    check_income, check_expense,
+    check_savings_target, check_contribution,
+    check_category
+)
 
 # Test 1: Check valid semester dates
 def test_valid_period():
@@ -63,3 +67,61 @@ def test_calculate_earnings():
 
     assert result["paid_hours"] == 5.5
     assert result["estimated_earnings"] == 99.0
+
+# Test 7: Check valid income
+def test_valid_income():
+    check_income({
+        "source": "Salary",
+        "amount": 500,
+        "income_date": "2026-11-27"
+    })
+
+# Test 8: Check invalid income
+@pytest.mark.parametrize("amount", [0, -50, "bad", "NaN"])
+def test_invalid_income(amount):
+    with pytest.raises(ValueError):
+        check_income({
+            "source": "Salary",
+            "amount": amount,
+            "income_date": "2026-11-27"
+        })
+
+# Test 9: Check invalid expense
+def test_invalid_expense():
+    with pytest.raises(ValueError):
+        check_expense({
+            "category_id": 1,
+            "description": "Food",
+            "amount": 0,
+            "expense_date": "2026-11-27"
+        })
+
+# Test 10: Check invalid finance date
+def test_invalid_finance_date():
+    with pytest.raises(ValueError):
+        check_income({
+            "source": "Salary",
+            "amount": 500,
+            "income_date": "invalid"
+        })
+
+# Test 11: Check invalid savings target
+def test_invalid_savings_target():
+    with pytest.raises(ValueError):
+        check_savings_target({
+            "target_name": "Laptop",
+            "target_amount": 0
+        })
+
+# Test 12: Check invalid contribution
+def test_invalid_contribution():
+    with pytest.raises(ValueError):
+        check_contribution({
+            "amount": -100,
+            "contribution_date": "2026-11-27"
+        })
+
+# Test 13: Check invalid category
+def test_invalid_category():
+    with pytest.raises(ValueError):
+        check_category({"category_name": " "})
