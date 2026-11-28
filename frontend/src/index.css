@@ -28,12 +28,16 @@ body {
   color: #A9DCFF;
 }
 
-.header nav span {
+.header nav button {
   padding: 10px 14px;
+  border: none;
+  background: none;
   color: #FFFFFF;
+  font: inherit;
+  cursor: pointer;
 }
 
-.header nav span.active {
+.header nav button.active {
   background: #135E91;
   font-weight: 600;
 }
@@ -204,6 +208,75 @@ body {
   height: 100%;
   background: #1A78B8;
   border-radius: 999px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+}
+
+.form input,
+.form select {
+  padding: 8px;
+  border: 1px solid #AAAAAA;
+  font: inherit;
+}
+
+.button {
+  align-self: flex-start;
+  padding: 8px 16px;
+  border: none;
+  background: #1A78B8;
+  color: #FFFFFF;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.link-button {
+  margin-left: auto;
+  border: none;
+  background: none;
+  color: #B71A22;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.form .checkbox {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.inline-form {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #CCCCCC;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.error {
+  margin: 0;
+  font-size: 14px;
+  color: #B71A22;
+}
+
+.empty {
+  margin: 0;
+  font-size: 14px;
 }
 
 @media (max-width: 700px) {
