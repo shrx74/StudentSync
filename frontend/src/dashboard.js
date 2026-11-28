@@ -21,13 +21,17 @@ function today() {
   return `${weekday}, ${date.toLocaleDateString('en-CA')}`
 }
 
+function conflictName(conflict) {
+  return conflict.study_session || conflict.class_meeting
+}
+
 function conflictMessage(conflict) {
-  return `"${conflict.study_session}" overlaps with "${conflict.work_shift}"`
+  return `"${conflictName(conflict)}" overlaps with "${conflict.work_shift}"`
 }
 
 function isInConflict(title, conflicts) {
   return conflicts.some(
-    (conflict) => conflict.study_session === title || conflict.work_shift === title,
+    (conflict) => conflictName(conflict) === title || conflict.work_shift === title,
   )
 }
 
