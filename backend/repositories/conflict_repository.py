@@ -37,3 +37,24 @@ class ConflictRepository:
                 )
 
                 return cursor.fetchall()
+
+    def get_class_meetings(self, user_id):
+        with Database.connect() as connection:
+            with connection.cursor() as cursor:
+
+                cursor.execute(
+                    """
+                    SELECT m.meeting_id, c.course_name,
+                           m.day_of_week, m.start_time,
+                           m.end_time, m.start_date,
+                           m.end_date
+                    FROM class_meetings m
+                    JOIN courses c ON m.course_id = c.course_id
+                    JOIN semesters s ON c.semester_id = s.semester_id
+                    WHERE s.user_id = %s
+                    ORDER BY m.day_of_week, m.start_time
+                    """,
+                    (user_id,)
+                )
+
+                return cursor.fetchall()
