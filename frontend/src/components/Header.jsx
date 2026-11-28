@@ -1,4 +1,4 @@
-const PAGES = ['Dashboard', 'Academics']
+const PAGES = ['Dashboard', 'Academics', 'Work']
 
 function Header({ page, onNavigate }) {
   return (

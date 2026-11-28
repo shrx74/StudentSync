@@ -8,3 +8,7 @@ export function dateTime(value) {
   const time = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
   return `${day}, ${time}`
 }
+
+export function clockTime(value) {
+  return new Date(value).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+}

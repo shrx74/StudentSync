@@ -251,6 +251,12 @@ body {
   cursor: pointer;
 }
 
+.form .checkbox {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
 .error {
   margin: 0;
   font-size: 14px;
