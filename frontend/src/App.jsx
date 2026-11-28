@@ -4,6 +4,7 @@ import Header from './components/Header'
 import DashboardPage from './pages/DashboardPage'
 import AcademicsPage from './pages/AcademicsPage'
 import WorkPage from './pages/WorkPage'
+import BudgetingPage from './pages/BudgetingPage'
 
 function App() {
   const [page, setPage] = useState('Dashboard')
@@ -15,6 +16,7 @@ function App() {
         {page === 'Dashboard' && <DashboardPage />}
         {page === 'Academics' && <AcademicsPage />}
         {page === 'Work' && <WorkPage />}
+        {page === 'Budgeting' && <BudgetingPage />}
       </main>
       <Footer />
     </div>
