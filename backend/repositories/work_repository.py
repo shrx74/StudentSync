@@ -1,33 +1,12 @@
 
-from database.connection import Database
+from db import query
 
 
 class WorkRepository:
 
-    def query(self, sql, values=(), many=False):
-        with Database.connect() as connection:
-            with connection.cursor() as cursor:
-                cursor.execute(sql, values)
-
-                if cursor.description is None:
-                    return None
-
-                columns = [col.name for col in cursor.description]
-
-                if many:
-                    rows = cursor.fetchall()
-                    return [dict(zip(columns, row)) for row in rows]
-
-                row = cursor.fetchone()
-
-                if row is None:
-                    return None
-
-                return dict(zip(columns, row))
-
     # Add a job
     def create_job(self, user_id, data):
-        return self.query(
+        return query(
             """
             INSERT INTO jobs
             (user_id, employer, job_title, hourly_wage, start_date, end_date)
@@ -42,21 +21,21 @@ class WorkRepository:
 
     # Get all jobs
     def get_jobs(self, user_id):
-        return self.query(
+        return query(
             "SELECT * FROM jobs WHERE user_id = %s ORDER BY job_id",
             (user_id,), True
         )
 
     # Get one job
     def get_job(self, user_id, job_id):
-        return self.query(
+        return query(
             "SELECT * FROM jobs WHERE user_id = %s AND job_id = %s",
             (user_id, job_id)
         )
 
     # Update a job
     def update_job(self, user_id, job_id, data):
-        return self.query(
+        return query(
             """
             UPDATE jobs
             SET employer = %s, job_title = %s, hourly_wage = %s,
@@ -71,7 +50,7 @@ class WorkRepository:
 
     # Delete a job
     def delete_job(self, user_id, job_id):
-        return self.query(
+        return query(
             """
             DELETE FROM jobs
             WHERE user_id = %s AND job_id = %s
@@ -82,7 +61,7 @@ class WorkRepository:
 
     # Add a work shift
     def create_shift(self, user_id, data):
-        return self.query(
+        return query(
             """
             INSERT INTO work_shifts
             (job_id, start_time, end_time, break_minutes, break_paid, notes)
@@ -99,9 +78,9 @@ class WorkRepository:
 
     # Get all shifts
     def get_shifts(self, user_id):
-        return self.query(
+        return query(
             """
-            SELECT s.*, j.hourly_wage
+            SELECT s.*, j.hourly_wage, j.employer
             FROM work_shifts s
             JOIN jobs j ON s.job_id = j.job_id
             WHERE j.user_id = %s
@@ -112,7 +91,7 @@ class WorkRepository:
 
     # Get one shift
     def get_shift(self, user_id, shift_id):
-        return self.query(
+        return query(
             """
             SELECT s.*, j.hourly_wage
             FROM work_shifts s
@@ -124,7 +103,7 @@ class WorkRepository:
 
     # Update a work shift
     def update_shift(self, user_id, shift_id, data):
-        return self.query(
+        return query(
             """
             UPDATE work_shifts
             SET job_id = %s, start_time = %s, end_time = %s,
@@ -142,7 +121,7 @@ class WorkRepository:
 
     # Delete a work shift
     def delete_shift(self, user_id, shift_id):
-        return self.query(
+        return query(
             """
             DELETE FROM work_shifts
             WHERE shift_id = %s

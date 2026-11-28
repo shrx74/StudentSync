@@ -4,6 +4,10 @@ from routes.user_routes import user_bp
 from routes.academic_routes import academic_bp
 from routes.work_routes import work_bp
 from routes.conflict_routes import conflict_bp
+from routes.reminder_routes import reminder_bp
+from routes.budget_routes import budget_bp
+from routes.dashboard_routes import dashboard_bp
+from routes.study_routes import study_bp
 
 
 def create_app():
@@ -13,6 +17,10 @@ def create_app():
     app.register_blueprint(academic_bp)
     app.register_blueprint(work_bp)
     app.register_blueprint(conflict_bp)
+    app.register_blueprint(reminder_bp)
+    app.register_blueprint(budget_bp)
+    app.register_blueprint(dashboard_bp)
+    app.register_blueprint(study_bp)
 
     @app.errorhandler(ValueError)
     def invalid_data(error):

@@ -1,9 +1,9 @@
-
+from datetime import date, time
 from flask import Blueprint, request, jsonify
 
 from repositories.academic_repository import AcademicRepository
 from repositories.user_repository import UserRepository
-from utils import get_data, check_period, check_task
+from utils import get_data, check_period, check_task, check_meeting
 
 
 academic_bp = Blueprint("academic", __name__)
@@ -182,3 +182,89 @@ def task_details(user_id, task_id):
         return jsonify({"error": "Task not found"}), 404
 
     return jsonify(result)
+
+
+def meeting_json(meeting):
+    result = dict(meeting)
+
+    for field in ("start_date", "end_date"):
+        if isinstance(result.get(field), date):
+            result[field] = result[field].isoformat()
+
+    for field in ("start_time", "end_time"):
+        if isinstance(result.get(field), time):
+            result[field] = result[field].isoformat(
+                timespec="minutes"
+            )
+
+    return result
+
+@academic_bp.route(
+    "/users/<int:user_id>/courses/<int:course_id>/meetings",
+    methods=["GET", "POST"]
+)
+def meetings(user_id, course_id):
+
+    if request.method == "GET":
+
+        if academic.get_course(user_id, course_id) is None:
+            return jsonify({"error": "Course not found"}), 404
+
+        result = academic.get_class_meetings(user_id)
+
+        meetings = []
+
+        for meeting in result:
+            if meeting["course_id"] == course_id:
+                meetings.append(meeting_json(meeting))
+
+        return jsonify(meetings)
+
+    data = get_data([
+        "day_of_week", "start_time", "end_time",
+        "start_date", "end_date"
+    ])
+
+    check_meeting(data)
+
+    data["course_id"] = course_id
+
+    meeting = academic.create_class_meeting(user_id, data)
+
+    if meeting is None:
+        return jsonify({"error": "Course not found"}), 404
+
+    return jsonify(meeting_json(meeting)), 201
+
+@academic_bp.route(
+    "/users/<int:user_id>/meetings/<int:meeting_id>",
+    methods=["GET", "PUT", "DELETE"]
+)
+def meeting_details(user_id, meeting_id):
+
+    if request.method == "GET":
+        result = academic.get_class_meeting(
+            user_id, meeting_id
+        )
+
+    elif request.method == "DELETE":
+        result = academic.delete_class_meeting(
+            user_id, meeting_id
+        )
+
+    else:
+        data = get_data([
+            "day_of_week", "start_time", "end_time",
+            "start_date", "end_date"
+        ])
+
+        check_meeting(data)
+
+        result = academic.update_class_meeting(
+            user_id, meeting_id, data
+        )
+
+    if result is None:
+        return jsonify({"error": "Meeting not found"}), 404
+
+    return jsonify(meeting_json(result))

@@ -1,25 +1,22 @@
+import { useState } from 'react'
 import Footer from './components/Footer'
 import Header from './components/Header'
-import Schedule from './components/Schedule'
-import Notifications from './components/Notifications'
-import Deadlines from './components/Deadlines'
-import ConflictBanner from './components/ConflictBanner'
-import FinancialOverview from './components/FinancialOverview'
-import { dashboardData } from './sampleData'
+import DashboardPage from './pages/DashboardPage'
+import AcademicsPage from './pages/AcademicsPage'
+import WorkPage from './pages/WorkPage'
+import BudgetingPage from './pages/BudgetingPage'
 
 function App() {
+  const [page, setPage] = useState('Dashboard')
+
   return (
     <div className="page">
-      <Header />
+      <Header page={page} onNavigate={setPage} />
       <main className="dashboard">
-        <h1>Dashboard</h1>
-        {dashboardData.hasConflict && <ConflictBanner message={dashboardData.conflictMessage} />}
-        <div className="panels">
-          <Schedule date={dashboardData.date} items={dashboardData.schedule} />
-          <Notifications items={dashboardData.notifications} />
-          <Deadlines items={dashboardData.deadlines} />
-          <FinancialOverview tiles={dashboardData.finance} />
-        </div>
+        {page === 'Dashboard' && <DashboardPage />}
+        {page === 'Academics' && <AcademicsPage />}
+        {page === 'Work' && <WorkPage />}
+        {page === 'Budgeting' && <BudgetingPage />}
       </main>
       <Footer />
     </div>
