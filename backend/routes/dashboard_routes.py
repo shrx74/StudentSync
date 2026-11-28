@@ -36,14 +36,16 @@ def todays_schedule(user_id, today):
             })
 
     for shift in work.get_shifts(user_id):
-        if shift["start_time"].date() == today:
-            shift = calculate_earnings(shift)
+        start = shift["start_time"].astimezone()
+        end = shift["end_time"].astimezone()
+
+        if start.date() == today:
             schedule.append({
                 "type": "Work Shift",
                 "title": shift["employer"],
-                "start": shift["start_time"].strftime("%H:%M"),
-                "end": shift["end_time"].strftime("%H:%M"),
-                "estimated_earnings": shift["estimated_earnings"]
+                "start": start.strftime("%H:%M"),
+                "end": end.strftime("%H:%M"),
+                "estimated_earnings": calculate_earnings(shift)["estimated_earnings"]
             })
 
     return sorted(schedule, key=lambda item: item["start"])

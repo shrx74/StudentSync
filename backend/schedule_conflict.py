@@ -53,6 +53,10 @@ class ScheduleConflictChecker:
         self, shift_start, shift_end, day_of_week,
         class_start, class_end, start_date, end_date
     ):
+        # Use local time so the shift matches the class schedule
+        shift_start = shift_start.astimezone()
+        shift_end = shift_end.astimezone()
+
         # Get the date of the work shift
         shift_date = shift_start.date()
 

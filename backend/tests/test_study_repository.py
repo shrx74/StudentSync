@@ -65,4 +65,3 @@ def test_delete_study_session(mock_query):
 
     mock_query.assert_called_once()
     assert mock_query.call_args.args[1] == (1, 1)
-

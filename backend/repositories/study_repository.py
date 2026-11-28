@@ -41,4 +41,3 @@ class StudyRepository:
             """,
             (user_id, session_id)
         )
-
