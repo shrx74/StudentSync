@@ -1,18 +1,9 @@
+import { dateTime, money } from './format'
+
 const STATUS_LABELS = {
   pending: 'Pending',
   in_progress: 'In Progress',
   completed: 'Completed',
-}
-
-function money(amount) {
-  return `$${amount.toFixed(2)}`
-}
-
-function dateTime(iso) {
-  const date = new Date(iso)
-  const day = date.toLocaleDateString('en-CA')
-  const time = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
-  return `${day}, ${time}`
 }
 
 function today() {
